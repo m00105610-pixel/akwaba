@@ -1,0 +1,680 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mahjong Akwaba</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;600;800&display=swap">
+<style>
+/* Concept : un tapis de jeu vert profond tissé comme un pagne, des tuiles d'ivoire à tranche orange, dix-huit symboles dessinés pour la Côte d'Ivoire. Un seul univers, sombre. */
+:root{
+  --orange:#F77F00;
+  --orange-deep:#D96A00;
+  --green:#009E60;
+  --green-deep:#0B7A4B;
+  --felt:#0A3324;
+  --felt-2:#0F4833;
+  --ivory:#FFF6E0;
+  --ink:#2A1608;
+  --gold:#E9A81C;
+  --soft:rgba(255,246,224,.74);
+  --line:rgba(255,246,224,.18);
+  --font-display:"Alfa Slab One","Rockwell","Georgia",serif;
+  --font-body:"Figtree","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0;
+  padding-inline:16px;
+  padding-block:14px 36px;
+  background-color:var(--felt);
+  background-image:
+    linear-gradient(135deg,rgba(247,127,0,.10) 25%,transparent 25%),
+    linear-gradient(225deg,rgba(247,127,0,.10) 25%,transparent 25%),
+    linear-gradient(315deg,rgba(0,158,96,.14) 25%,transparent 25%),
+    linear-gradient(45deg,rgba(0,158,96,.14) 25%,transparent 25%);
+  background-size:56px 56px;
+  color:var(--ivory);
+  font:15px/1.45 var(--font-body);
+}
+h1,h2,p{margin:0}
+.app{max-width:600px;margin-inline:auto;display:flex;flex-direction:column;gap:14px}
+.flag{display:grid;grid-template-columns:repeat(3,1fr);height:7px;border-radius:4px;overflow:hidden}
+.flag i:nth-child(1){background:var(--orange)}
+.flag i:nth-child(2){background:#fff}
+.flag i:nth-child(3){background:var(--green)}
+
+.top{display:flex;align-items:center;gap:14px}
+.titles{min-width:0}
+h1{font:400 clamp(24px,7vw,32px)/1.05 var(--font-display);letter-spacing:.01em;text-wrap:balance}
+.tag{margin-top:4px;font:800 11px/1.2 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--orange)}
+.logo{position:relative;width:60px;height:52px;flex:none}
+.mini{position:absolute;width:34px;height:42px;border-radius:7px;background:linear-gradient(158deg,#FFFEF8,#F1E4C2);box-shadow:3px 3px 0 var(--orange-deep),4px 4px 0 1px #6A3200;display:grid;place-items:center}
+.mini svg{width:26px;height:26px}
+.m1{left:0;top:7px;transform:rotate(-9deg)}
+.m2{left:22px;top:0;transform:rotate(7deg)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{min-width:0;padding:8px 4px 7px;text-align:center;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:12px}
+.lab{display:block;font:800 10px/1.2 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b{display:block;margin-top:3px;font:400 19px/1.1 var(--font-display);font-variant-numeric:tabular-nums}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:2px solid var(--ivory);border-radius:12px;overflow:hidden}
+.seg button{min-height:40px;padding:0 14px;border:0;background:transparent;color:var(--ivory);font:800 14px/1 var(--font-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ivory);color:var(--ink)}
+
+.btn{min-width:0;min-height:44px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;border:2px solid var(--ivory);background:transparent;color:var(--ivory);font:800 14px/1 var(--font-body);cursor:pointer}
+.btn svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn:hover{background:rgba(255,246,224,.12)}
+.btn.pri{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+.btn.pri:hover{background:#FF9122}
+.btn.dark{border-color:var(--ink);color:var(--ink)}
+.btn.dark:hover{background:rgba(42,22,8,.08)}
+.btn:disabled{opacity:.42;cursor:default;background:transparent}
+:focus-visible{outline:3px solid #FFD27A;outline-offset:3px}
+
+.mat{position:relative;display:flex;justify-content:center;padding:16px 10px 20px;border-radius:18px;background:radial-gradient(120% 90% at 50% 15%,var(--felt-2),var(--felt) 72%);box-shadow:0 0 0 2px var(--orange),0 0 0 5px var(--felt),0 0 0 7px rgba(255,246,224,.55),0 16px 30px rgba(0,0,0,.4)}
+.stage{position:relative;margin-inline:auto}
+.status{min-height:2.9em;text-align:center;color:var(--soft);font-size:14px;text-wrap:balance}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* Tuiles */
+.tile{position:absolute;width:var(--tw);height:var(--th);padding:0;margin:0;border:0;cursor:pointer;
+  border-radius:calc(var(--tw)*.17);
+  background:linear-gradient(158deg,#FFFEF8 0%,#FBF2DA 55%,#F1E4C2 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(122,72,24,.28),inset 0 2px 1px rgba(255,255,255,.95),var(--sd) var(--sd) 0 0 var(--orange-deep),calc(var(--sd) + 1px) calc(var(--sd) + 1px) 0 1px #6A3200;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .14s ease,opacity .25s ease}
+.tile svg{position:absolute;left:8%;top:11%;width:84%;height:auto;aspect-ratio:1;pointer-events:none}
+.tile .zz{position:absolute;left:30%;right:30%;bottom:7%;height:max(3px,calc(var(--tw)*.06));border-radius:2px;box-shadow:0 0 0 1px rgba(122,72,24,.4);background:linear-gradient(90deg,var(--orange) 33.3%,#fff 33.3% 66.6%,var(--green) 66.6%);pointer-events:none}
+.tile.blocked::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(40,22,6,.22);pointer-events:none}
+.tile.sel{z-index:9999!important;transform:translate(-2px,-3px)}
+.tile.sel::before,.tile.hint::before{content:"";position:absolute;inset:-4px;border-radius:calc(var(--tw)*.22);border:3px solid #FFC25A;box-shadow:0 0 14px 3px rgba(255,170,40,.75);pointer-events:none}
+.tile.hint{z-index:9998!important}
+.tile.hint::before{border-color:#5CF2A6;box-shadow:0 0 14px 3px rgba(60,230,150,.8);animation:pulse .7s ease-in-out infinite alternate}
+.tile.gone{opacity:0;transform:scale(.7) rotate(-6deg);pointer-events:none}
+.tile.off{display:none}
+.tile.in{animation:drop .5s cubic-bezier(.2,.8,.25,1) backwards;animation-delay:calc(var(--n)*9ms)}
+.tile.back{animation:back .3s ease-out backwards}
+.tile.shake{animation:shake .3s}
+.tile.shuf{animation:shuf .5s ease-in-out}
+@keyframes drop{from{opacity:0;translate:0 -26px;scale:.92}}
+@keyframes back{from{opacity:0;scale:.6}}
+@keyframes shake{25%{translate:-3px 0}75%{translate:3px 0}}
+@keyframes shuf{50%{scale:.7 1;opacity:.5}}
+@keyframes pulse{from{opacity:.55}to{opacity:1}}
+
+/* Règles et symboles */
+.legend{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:0 14px 14px}
+.legend summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:800}
+.legend .rules{color:var(--soft);font-size:14px}
+.legend ul{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.legend li{display:flex;align-items:center;gap:10px;min-width:0}
+.chip{flex:none;width:42px;height:50px;border-radius:9px;background:linear-gradient(158deg,#FFFEF8,#F1E4C2);box-shadow:3px 3px 0 var(--orange-deep);display:grid;place-items:center}
+.chip svg{width:34px;height:34px}
+.legend li span:last-child{min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.legend li b{font-size:14px}
+.legend li small{color:var(--soft);font-size:12px}
+
+/* Fenêtre */
+.overlay{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;padding:16px;background:rgba(5,24,16,.8)}
+.card{width:100%;max-width:380px;padding:0 20px 20px;overflow:hidden;border-radius:18px;background:var(--ivory);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.card .flag{height:10px;margin:0 -20px 18px;border-radius:0}
+.card h2{font:400 28px/1.1 var(--font-display);text-wrap:balance}
+.card p{margin-top:10px}
+.ov-actions{display:grid;gap:10px;margin-top:18px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6FB52C"/><stop offset=".5" stop-color="#F2B01E"/><stop offset="1" stop-color="#F77F00"/></linearGradient>
+<clipPath id="cp8"><ellipse cx="24" cy="31" rx="11" ry="14"/></clipPath>
+</defs>
+<!-- 0 Éléphant -->
+<symbol id="s0" viewBox="0 0 48 48">
+<circle cx="10" cy="21" r="9" fill="#F77F00"/><circle cx="38" cy="21" r="9" fill="#F77F00"/>
+<circle cx="10" cy="21" r="5" fill="#FFB347"/><circle cx="38" cy="21" r="5" fill="#FFB347"/>
+<ellipse cx="24" cy="21" rx="12" ry="13" fill="#0B7A4B"/>
+<path d="M24 27v10q0 6-6 6" fill="none" stroke="#0B7A4B" stroke-width="8" stroke-linecap="round"/>
+<path d="M14.5 31q-3 7 2 11M33.5 31q3 7-2 11" fill="none" stroke="#E9A81C" stroke-width="3" stroke-linecap="round"/>
+<circle cx="19" cy="18" r="1.8" fill="#2A1608"/><circle cx="29" cy="18" r="1.8" fill="#2A1608"/>
+</symbol>
+<!-- 1 Masque gouro -->
+<symbol id="s1" viewBox="0 0 48 48">
+<path d="M13 12l3-9 4 8 4-10 4 10 4-8 3 9z" fill="#F77F00"/>
+<ellipse cx="24" cy="28" rx="12" ry="17" fill="#8B4A1F"/>
+<path d="M12.5 22Q24 10 35.5 22Q24 17 12.5 22Z" fill="#2A1608"/>
+<path d="M16 27q3 2.6 6 0M26 27q3 2.6 6 0" fill="none" stroke="#FFE9B8" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M24 24v9" stroke="#5A2B0E" stroke-width="3.2" stroke-linecap="round"/>
+<ellipse cx="24" cy="40" rx="4" ry="2.3" fill="#2A1608"/>
+<path d="M14.5 33l3 1M33.5 33l-3 1" stroke="#FFE9B8" stroke-width="1.6" stroke-linecap="round"/>
+<circle cx="24" cy="15" r="1.6" fill="#009E60"/>
+</symbol>
+<!-- 2 Djembé -->
+<symbol id="s2" viewBox="0 0 48 48">
+<path d="M11 11Q15 25 19 34L15 44H33L29 34Q33 25 37 11Q24 17 11 11Z" fill="#A55A24"/>
+<ellipse cx="24" cy="11" rx="13" ry="4.5" fill="#F3DCA8" stroke="#6B3A18" stroke-width="1.5"/>
+<path d="M12.5 15L19 23L24 16L29 23L35.5 15" fill="none" stroke="#FFE9B8" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="M16.5 38H31.5" stroke="#009E60" stroke-width="3" stroke-linecap="round"/>
+</symbol>
+<!-- 3 Balafon -->
+<symbol id="s3" viewBox="0 0 48 48">
+<g fill="#8B4A1F"><circle cx="10" cy="40" r="5"/><circle cx="17" cy="40" r="4.6"/><circle cx="24" cy="40" r="4.2"/><circle cx="31" cy="40" r="3.8"/><circle cx="38" cy="40" r="3.4"/></g>
+<path d="M4 34H44" stroke="#2A1608" stroke-width="2" stroke-linecap="round"/>
+<rect x="7" y="8" width="6" height="26" rx="2" fill="#F77F00"/>
+<rect x="14" y="12" width="6" height="22" rx="2" fill="#E9A81C"/>
+<rect x="21" y="16" width="6" height="18" rx="2" fill="#F77F00"/>
+<rect x="28" y="20" width="6" height="14" rx="2" fill="#E9A81C"/>
+<rect x="35" y="24" width="6" height="10" rx="2" fill="#F77F00"/>
+</symbol>
+<!-- 4 Attiéké -->
+<symbol id="s4" viewBox="0 0 48 48">
+<path d="M7 29H41A17 16 0 0 1 7 29Z" fill="#009E60"/>
+<path d="M9 29Q9 9 24 8Q39 9 39 29Z" fill="#F3E3B0" stroke="#C9A24B" stroke-width="1.4"/>
+<g fill="#D6AE55"><circle cx="18" cy="20" r="1.4"/><circle cx="25" cy="15" r="1.4"/><circle cx="30" cy="22" r="1.4"/><circle cx="22" cy="25" r="1.4"/><circle cx="15" cy="26" r="1.4"/><circle cx="33" cy="27" r="1.4"/></g>
+<circle cx="31" cy="12" r="3.2" fill="#D8412A"/>
+<path d="M9 34H39" stroke="#F77F00" stroke-width="2.6"/>
+<path d="M18 45H30" stroke="#0B7A4B" stroke-width="3" stroke-linecap="round"/>
+</symbol>
+<!-- 5 Cabosse -->
+<symbol id="s5" viewBox="0 0 48 48">
+<g transform="rotate(35 24 24)">
+<path d="M24 3C34 10 36 38 24 45C12 38 14 10 24 3Z" fill="#E9A81C" stroke="#9A5A00" stroke-width="1.5"/>
+<path d="M24 3V45M18 9C16 20 16 30 20 41M30 9C32 20 32 30 28 41" stroke="#C9780A" stroke-width="1.6" fill="none"/>
+</g>
+<path d="M36 7q6-4 9 1q-6 4-9-1z" fill="#009E60"/>
+</symbol>
+<!-- 6 Noix de cola -->
+<symbol id="s6" viewBox="0 0 48 48">
+<path d="M9 14q5-9 15-6q-4 9-15 6z" fill="#009E60"/><path d="M39 14q-5-9-15-6q4 9 15 6z" fill="#0B7A4B"/>
+<ellipse cx="17" cy="29" rx="7.5" ry="11" fill="#B3401F" transform="rotate(-14 17 29)"/>
+<ellipse cx="31" cy="29" rx="7.5" ry="11" fill="#C9502A" transform="rotate(14 31 29)"/>
+<ellipse cx="24" cy="31" rx="8" ry="12" fill="#9C2F14"/>
+<ellipse cx="21.5" cy="26" rx="2" ry="5" fill="#FFB9A0" opacity=".55"/>
+</symbol>
+<!-- 7 Plantain -->
+<symbol id="s7" viewBox="0 0 48 48">
+<path d="M7 14C7 34 22 44 42 31C40 28 37 28 35 30C25 36 15 30 13 12Z" fill="#F2C230" stroke="#8A6A00" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M9 20C10 32 20 40 34 36" stroke="#C99A00" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M7 14l1-6 6 1-1 3z" fill="#6B8F2A" stroke="#4A6A18" stroke-width="1"/>
+<path d="M40 30l3 3" stroke="#4A3A10" stroke-width="2.4" stroke-linecap="round"/>
+</symbol>
+<!-- 8 Ananas -->
+<symbol id="s8" viewBox="0 0 48 48">
+<ellipse cx="24" cy="31" rx="11" ry="14" fill="#F2A81C"/>
+<g clip-path="url(#cp8)" stroke="#B8650A" stroke-width="1.5" fill="none"><path d="M12 19L38 45M8 27L26 45M20 15L40 35M36 19L10 45M40 27L22 45M28 15L8 35"/></g>
+<ellipse cx="24" cy="31" rx="11" ry="14" fill="none" stroke="#9A5A00" stroke-width="1.6"/>
+<path d="M24 18L12 11L21 14ZM24 18L36 11L27 14Z" fill="#0B7A4B"/>
+<path d="M24 18L16 6L22 11L24 2L26 11L32 6Z" fill="#009E60"/>
+</symbol>
+<!-- 9 Cocotier -->
+<symbol id="s9" viewBox="0 0 48 48">
+<path d="M22 43Q27 30 24 16" stroke="#7A4B22" stroke-width="4" fill="none" stroke-linecap="round"/>
+<g fill="none" stroke="#0B7A4B" stroke-width="3.5" stroke-linecap="round"><path d="M24 16Q14 8 5 14"/><path d="M24 16Q18 4 9 5"/><path d="M24 16Q30 4 39 6"/><path d="M24 16Q34 8 43 15"/><path d="M24 16Q25 7 24 3"/></g>
+<circle cx="21" cy="19" r="2.6" fill="#6B3A18"/><circle cx="27" cy="19.5" r="2.6" fill="#6B3A18"/>
+<path d="M11 44H37" stroke="#E9A81C" stroke-width="3" stroke-linecap="round"/>
+</symbol>
+<!-- 10 Basilique -->
+<symbol id="s10" viewBox="0 0 48 48">
+<path d="M24 0.8v5M21.8 2.8h4.4" stroke="#6B3A18" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="22.4" y="5" width="3.2" height="4" fill="#E9A81C"/>
+<path d="M11 22A13 13 0 0 1 37 22Z" fill="#243B7A"/>
+<rect x="10" y="22" width="28" height="4" fill="#E9A81C"/>
+<rect x="8" y="26" width="32" height="12" fill="#6B3A18"/>
+<g fill="#FFE9B8"><rect x="10" y="26" width="3.4" height="12"/><rect x="16.5" y="26" width="3.4" height="12"/><rect x="22.3" y="26" width="3.4" height="12"/><rect x="28.2" y="26" width="3.4" height="12"/><rect x="34.6" y="26" width="3.4" height="12"/></g>
+<rect x="6" y="38" width="36" height="3" fill="#8B4A1F"/>
+<rect x="3" y="41" width="42" height="3.5" fill="#6B3A18"/>
+</symbol>
+<!-- 11 Pagne -->
+<symbol id="s11" viewBox="0 0 48 48">
+<rect x="5" y="5" width="38" height="38" rx="4" fill="#F77F00"/>
+<path d="M24 8L40 24L24 40L8 24Z" fill="#0B7A4B"/>
+<path d="M24 14L34 24L24 34L14 24Z" fill="#FFF3D0"/>
+<path d="M24 19L29 24L24 29L19 24Z" fill="#243B7A"/>
+<g fill="#FFF3D0"><circle cx="10" cy="10" r="1.8"/><circle cx="38" cy="10" r="1.8"/><circle cx="10" cy="38" r="1.8"/><circle cx="38" cy="38" r="1.8"/></g>
+<rect x="5" y="5" width="38" height="38" rx="4" fill="none" stroke="#2A1608" stroke-width="1.5"/>
+</symbol>
+<!-- 12 Tabouret akan -->
+<symbol id="s12" viewBox="0 0 48 48">
+<rect x="9" y="21" width="5" height="17" fill="#A55A24"/><rect x="34" y="21" width="5" height="17" fill="#A55A24"/>
+<rect x="20" y="17" width="8" height="21" fill="#A55A24"/>
+<path d="M24 22l3 5.5l-3 5.5l-3-5.5z" fill="#FFF3D0"/>
+<path d="M6 18Q24 6 42 18V23Q24 12 6 23Z" fill="#8B4A1F"/>
+<path d="M8 21Q24 10 40 21" stroke="#E9A81C" stroke-width="1.6" fill="none"/>
+<path d="M5 38H43V43H5Z" fill="#6B3A18"/>
+</symbol>
+<!-- 13 Poisson -->
+<symbol id="s13" viewBox="0 0 48 48">
+<path d="M16 16Q22 8 29 16Z" fill="#F77F00"/>
+<path d="M5 24Q18 8 34 20L44 12V36L34 28Q18 40 5 24Z" fill="#1F78C1"/>
+<path d="M34 20L44 12V36L34 28Z" fill="#F77F00"/>
+<path d="M14 20q4 4 0 8M20 17q4 7 0 14M26 19q3 5 0 10" stroke="#BFE3FA" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<circle cx="11.5" cy="22" r="2.2" fill="#fff"/><circle cx="11" cy="22" r="1.1" fill="#2A1608"/>
+</symbol>
+<!-- 14 Soleil -->
+<symbol id="s14" viewBox="0 0 48 48">
+<path d="M24 3v6M24 39v6M3 24h6M39 24h6M9 9l4.2 4.2M34.8 34.8L39 39M9 39l4.2-4.2M34.8 13.2L39 9" stroke="#E9A81C" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+<circle cx="24" cy="24" r="12" fill="#F77F00"/>
+<circle cx="24" cy="24" r="7" fill="#FFB347"/>
+</symbol>
+<!-- 15 Calao -->
+<symbol id="s15" viewBox="0 0 48 48">
+<ellipse cx="24" cy="32" rx="10" ry="12" fill="#243B7A"/>
+<ellipse cx="25" cy="34" rx="6" ry="9" fill="#FFF3D0"/>
+<path d="M20 30h10M20 35h10M21 40h8" stroke="#F77F00" stroke-width="1.7" stroke-linecap="round"/>
+<circle cx="22" cy="11" r="6.5" fill="#243B7A"/>
+<path d="M27 7Q42 7 43 20Q36 14 27 15Z" fill="#F77F00"/>
+<circle cx="23" cy="10" r="1.7" fill="#FFF3D0"/>
+<path d="M14 45.5H34" stroke="#6B3A18" stroke-width="2.4" stroke-linecap="round"/>
+</symbol>
+<!-- 16 Pirogue -->
+<symbol id="s16" viewBox="0 0 48 48">
+<path d="M3 40q4-4 8 0t8 0t8 0t8 0t8 0" stroke="#1F78C1" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M5 29H43Q40 38 34 38H14Q8 38 5 29Z" fill="#F77F00"/>
+<path d="M7 32H41" stroke="#0B7A4B" stroke-width="2.6"/>
+<path d="M17 29l3-12h6l3 12z" fill="#243B7A"/>
+<circle cx="23" cy="12" r="4.6" fill="#8B4A1F"/>
+<path d="M31 11L40 34" stroke="#6B3A18" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M38 31l5 4-3 4-4-4z" fill="#6B3A18"/>
+</symbol>
+<!-- 17 Mangue -->
+<symbol id="s17" viewBox="0 0 48 48">
+<path d="M9 24C8 12 24 6 34 12C44 19 42 36 30 42C18 47 10 38 9 24Z" fill="url(#gm)" stroke="#9A5A00" stroke-width="1.3"/>
+<path d="M15 21q2-6 8-8" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M26 9q4-8 14-5q-3 8-14 5z" fill="#0B7A4B"/>
+<path d="M26 10l-1-4" stroke="#4A6A18" stroke-width="1.6" stroke-linecap="round"/>
+</symbol>
+</svg>
+
+<div class="app">
+  <div class="flag" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <header class="top">
+    <div class="logo" aria-hidden="true">
+      <span class="mini m1"><svg viewBox="0 0 48 48"><use href="#s1" width="48" height="48"/></svg></span>
+      <span class="mini m2"><svg viewBox="0 0 48 48"><use href="#s0" width="48" height="48"/></svg></span>
+    </div>
+    <div class="titles">
+      <h1>Mahjong Akwaba</h1>
+      <p class="tag">Akwaba · Bienvenue</p>
+    </div>
+  </header>
+
+  <section class="stats" aria-label="Partie en cours">
+    <div class="stat"><span class="lab">Temps</span><b id="time">0:00</b></div>
+    <div class="stat"><span class="lab">Paires</span><b id="left">36</b></div>
+    <div class="stat"><span class="lab">Jouables</span><b id="moves">0</b></div>
+    <div class="stat"><span class="lab">Record</span><b id="best">–</b></div>
+  </section>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Choix de la grille">
+      <button type="button" data-k="basilique" aria-pressed="true">Basilique</button>
+      <button type="button" data-k="pagne" aria-pressed="false">Pagne</button>
+    </div>
+    <button class="btn" id="new" type="button">Nouvelle partie</button>
+  </div>
+
+  <div class="mat" id="mat"><div class="stage" id="stage" role="group" aria-label="Plateau de tuiles"></div></div>
+  <p class="status" id="status" role="status"></p>
+
+  <div class="actions">
+    <button class="btn" id="undo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Annuler</button>
+    <button class="btn" id="hint" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Indice</button>
+    <button class="btn pri" id="shuffle" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span id="shuffle-l">Mélanger (3)</span></button>
+  </div>
+
+  <details class="legend">
+    <summary>Règles et symboles</summary>
+    <p class="rules">Retire les tuiles par paires identiques. Une tuile est libre quand rien ne la recouvre et qu'un de ses côtés, gauche ou droit, est dégagé. Les tuiles assombries sont bloquées. Vide la grille pour gagner.</p>
+    <ul id="legend"></ul>
+  </details>
+</div>
+
+<div class="overlay" id="ov" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="ov-title">
+    <div class="flag" aria-hidden="true"><i></i><i></i><i></i></div>
+    <h2 id="ov-title"></h2>
+    <p id="ov-text"></p>
+    <div class="ov-actions" id="ov-actions"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/*CORE_START*/
+function rows(z,y,x0,x1){var a=[];for(var x=x0;x<=x1;x+=2)a.push({x:x,y:y,z:z});return a;}
+var LAYOUTS={
+  basilique:{name:"Basilique",tiles:[].concat(
+    rows(0,0,2,12),rows(0,2,0,14),rows(0,4,0,14),rows(0,6,0,14),rows(0,8,0,14),rows(0,10,2,12),
+    rows(1,2,4,10),rows(1,4,2,12),rows(1,6,2,12),rows(1,8,4,10),
+    rows(2,4,4,10),rows(2,6,4,10))},
+  pagne:{name:"Pagne",tiles:[].concat(
+    rows(0,0,6,8),rows(0,2,4,10),rows(0,4,2,12),rows(0,6,0,14),rows(0,8,0,14),rows(0,10,2,12),rows(0,12,4,10),rows(0,14,6,8),
+    rows(1,4,4,10),rows(1,6,2,12),rows(1,8,2,12),rows(1,10,4,10),
+    rows(2,6,4,10),rows(2,8,4,10),
+    rows(3,7,6,8))}
+};
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function makeTiles(key){return LAYOUTS[key].tiles.map(function(t,i){return {x:t.x,y:t.y,z:t.z,i:i,kind:-1,removed:false,el:null};});}
+function isFree(t,tiles,alive){
+  var left=false,right=false;
+  for(var n=0;n<tiles.length;n++){
+    var u=tiles[n];
+    if(u===t||!alive(u))continue;
+    var dx=u.x-t.x,dy=Math.abs(u.y-t.y);
+    if(u.z>t.z&&Math.abs(dx)<2&&dy<2)return false;
+    if(u.z===t.z&&dy<2){if(dx===-2)left=true;else if(dx===2)right=true;}
+  }
+  return !(left&&right);
+}
+function dealKinds(tiles,idxs,kinds){
+  for(var attempt=0;attempt<400;attempt++){
+    var pool=shuffle(kinds.slice()),set=new Set(idxs),got=new Map(),ok=true;
+    var alive=function(u){return set.has(u.i);};
+    while(set.size){
+      var free=[];
+      set.forEach(function(i){if(isFree(tiles[i],tiles,alive))free.push(i);});
+      if(free.length<2){ok=false;break;}
+      shuffle(free);
+      var a=free[0],b=free[1],k=pool.pop();
+      got.set(a,k);got.set(b,k);set.delete(a);set.delete(b);
+    }
+    if(ok)return got;
+  }
+  return null;
+}
+function pairKinds(n,K){
+  var order=[];for(var i=0;i<K;i++)order.push(i);
+  shuffle(order);
+  var out=[];for(var p=0;p<n;p++)out.push(order[p%K]);
+  return out;
+}
+/*CORE_END*/
+
+var NAMES=["Éléphant","Masque gouro","Djembé","Balafon","Attiéké","Cabosse","Noix de cola","Plantain","Ananas","Cocotier","Basilique","Pagne","Tabouret akan","Poisson","Soleil","Calao","Pirogue","Mangue"];
+var CAPS=["Emblème du pays","Danse et cérémonie","Tambour de fête","Xylophone sénoufo","Semoule de manioc","Fruit du cacaoyer","Offerte en signe d'accueil","Pour l'alloco","Ananas du pays","Plages du Sud","Yamoussoukro","Motifs tissés","Siège des chefs akan","Pêche en lagune","Soleil du pays","Oiseau sénoufo","Sur la lagune Ébrié","Fruit de saison"];
+
+var $=function(id){return document.getElementById(id);};
+var stage=$("stage"),mat=$("mat"),statusEl=$("status"),ov=$("ov");
+var G=null,hintTimer=0;
+
+function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+function loadBest(){try{return JSON.parse(localStorage.getItem("akwaba-best")||"{}")||{};}catch(e){return {};}}
+function saveBest(o){try{localStorage.setItem("akwaba-best",JSON.stringify(o));}catch(e){}}
+function say(m){statusEl.textContent=m;}
+var alive=function(u){return !u.removed;};
+
+function place(){
+  var L=G.tiles;
+  var maxX=0,maxY=0,maxZ=0;
+  L.forEach(function(t){maxX=Math.max(maxX,t.x+2);maxY=Math.max(maxY,t.y+2);maxZ=Math.max(maxZ,t.z);});
+  var cols=maxX/2,rowsN=maxY/2;
+  var avail=Math.max(240,mat.clientWidth-20);
+  var tw=avail/(cols*1.09+(maxZ+1)*.09);
+  var availH=Math.max(320,window.innerHeight-340);
+  var twH=availH/(rowsN*1.31+(maxZ+1)*.09);
+  tw=Math.floor(Math.max(24,Math.min(tw,twH,68)));
+  var sd=Math.max(3,Math.round(tw*.09)),th=Math.round(tw*1.22);
+  var px=tw+sd,py=th+sd,hx=px/2,hy=py/2;
+  stage.style.setProperty("--tw",tw+"px");
+  stage.style.setProperty("--th",th+"px");
+  stage.style.setProperty("--sd",sd+"px");
+  stage.style.width=((cols-1)*px+tw+(maxZ+1)*sd+2)+"px";
+  stage.style.height=((rowsN-1)*py+th+(maxZ+1)*sd+2)+"px";
+  L.forEach(function(t){
+    var s=t.el.style;
+    s.left=(t.x*hx+(maxZ-t.z)*sd)+"px";
+    s.top=(t.y*hy+(maxZ-t.z)*sd)+"px";
+    s.zIndex=t.z*1000+t.y*20+t.x;
+  });
+}
+
+function setFace(t){
+  t.el.querySelector("use").setAttribute("href","#s"+t.kind);
+  t.el.setAttribute("aria-label",NAMES[t.kind]);
+}
+
+function build(animate){
+  stage.textContent="";
+  G.tiles.forEach(function(t){
+    var b=document.createElement("button");
+    b.type="button";
+    b.className="tile"+(animate?" in":"");
+    b.dataset.i=t.i;
+    b.innerHTML='<svg viewBox="0 0 48 48" aria-hidden="true"><use width="48" height="48"/></svg><i class="zz"></i>';
+    t.el=b;setFace(t);
+    if(t.removed)b.classList.add("off");
+    stage.appendChild(b);
+  });
+  G.tiles.slice().sort(function(a,b){return a.z-b.z||a.y-b.y||a.x-b.x;}).forEach(function(t,r){t.el.style.setProperty("--n",r);});
+  place();
+  refresh();
+  if(animate)setTimeout(function(){stage.querySelectorAll(".in").forEach(function(e){e.classList.remove("in");});},1600);
+}
+
+function findPairs(free){
+  var by={};
+  free.forEach(function(t){(by[t.kind]=by[t.kind]||[]).push(t);});
+  var out=[];
+  Object.keys(by).forEach(function(k){var l=by[k];for(var i=0;i<l.length;i++)for(var j=i+1;j<l.length;j++)out.push([l[i],l[j]]);});
+  return out;
+}
+
+function refresh(){
+  var live=G.tiles.filter(alive);
+  var free=live.filter(function(t){return isFree(t,G.tiles,alive);});
+  var fs=new Set(free.map(function(t){return t.i;}));
+  live.forEach(function(t){t.el.classList.toggle("blocked",!fs.has(t.i));});
+  G.pairs=findPairs(free);
+  $("left").textContent=live.length/2;
+  $("moves").textContent=G.pairs.length;
+  var best=loadBest()[G.key];
+  $("best").textContent=best!=null?fmt(best):"–";
+  $("time").textContent=fmt(G.elapsed);
+  $("undo").disabled=G.over||!G.history.length;
+  $("hint").disabled=G.over;
+  $("shuffle").disabled=G.over||G.shuffles<=0;
+  $("shuffle-l").textContent="Mélanger ("+G.shuffles+")";
+}
+
+function mark(t,on){
+  t.el.classList.toggle("sel",on);
+  if(on)t.el.setAttribute("aria-pressed","true");else t.el.removeAttribute("aria-pressed");
+}
+function clearHint(){
+  clearTimeout(hintTimer);
+  stage.querySelectorAll(".hint").forEach(function(e){e.classList.remove("hint");});
+}
+function shake(t){
+  t.el.classList.remove("shake");void t.el.offsetWidth;t.el.classList.add("shake");
+}
+
+function startTimer(){
+  if(G.running||G.over)return;
+  G.running=true;
+  G.t0=performance.now()-G.elapsed*1000;
+}
+setInterval(function(){
+  if(G&&G.running&&!G.over){
+    G.elapsed=Math.floor((performance.now()-G.t0)/1000);
+    $("time").textContent=fmt(G.elapsed);
+  }
+},500);
+
+function onTile(t){
+  if(G.over||t.removed)return;
+  if(!isFree(t,G.tiles,alive)){
+    shake(t);
+    say("Tuile bloquée : il faut un côté dégagé et rien dessus.");
+    return;
+  }
+  startTimer();
+  clearHint();
+  if(!G.sel){G.sel=t;mark(t,true);say(NAMES[t.kind]+" : cherche la même.");return;}
+  if(G.sel===t){mark(t,false);G.sel=null;say("");return;}
+  if(G.sel.kind===t.kind){takePair(G.sel,t);return;}
+  mark(G.sel,false);G.sel=t;mark(t,true);
+  say("Pas la même tuile : "+NAMES[t.kind]+".");
+}
+
+function takePair(a,b){
+  mark(a,false);mark(b,false);G.sel=null;
+  a.removed=b.removed=true;
+  G.history.push([a.i,b.i]);
+  [a,b].forEach(function(t){
+    t.el.classList.add("gone");
+    setTimeout(function(){if(t.removed)t.el.classList.add("off");},260);
+  });
+  say("Paire trouvée : "+NAMES[a.kind]+".");
+  refresh();
+  var left=G.tiles.filter(alive).length;
+  if(left===0)return win();
+  if(G.pairs.length===0)stuck();
+}
+
+function undo(){
+  if(G.over||!G.history.length)return;
+  var pr=G.history.pop();
+  pr.forEach(function(i){
+    var t=G.tiles[i];
+    t.removed=false;
+    t.el.classList.remove("gone","off");
+    t.el.classList.add("back");
+    setTimeout(function(){t.el.classList.remove("back");},400);
+  });
+  if(G.sel){mark(G.sel,false);G.sel=null;}
+  clearHint();hideOv();refresh();
+  say("Dernier coup annulé.");
+}
+
+function hint(){
+  if(G.over)return;
+  clearHint();
+  if(!G.pairs.length){say("Aucune paire libre. Mélange les tuiles.");return;}
+  var p=G.pairs[Math.floor(Math.random()*G.pairs.length)];
+  p.forEach(function(t){t.el.classList.add("hint");});
+  hintTimer=setTimeout(clearHint,2200);
+  say("Ces deux tuiles vont ensemble.");
+}
+
+function doShuffle(){
+  if(G.over||G.shuffles<=0)return;
+  var live=G.tiles.filter(alive),cnt={},kinds=[];
+  live.forEach(function(t){cnt[t.kind]=(cnt[t.kind]||0)+1;});
+  Object.keys(cnt).forEach(function(k){for(var c=0;c<cnt[k]/2;c++)kinds.push(+k);});
+  var res=dealKinds(G.tiles,live.map(function(t){return t.i;}),kinds);
+  if(res){live.forEach(function(t){t.kind=res.get(t.i);});}
+  else{var flat=[];kinds.forEach(function(k){flat.push(k,k);});shuffle(flat);live.forEach(function(t,n){t.kind=flat[n];});}
+  live.forEach(function(t){
+    setFace(t);
+    t.el.classList.remove("shuf");void t.el.offsetWidth;t.el.classList.add("shuf");
+  });
+  if(G.sel){mark(G.sel,false);G.sel=null;}
+  G.shuffles--;G.history=[];
+  clearHint();hideOv();refresh();
+  say("Tuiles mélangées : la grille reste jouable.");
+}
+
+function showOv(title,text,btns){
+  $("ov-title").textContent=title;
+  $("ov-text").textContent=text;
+  var box=$("ov-actions");box.textContent="";
+  btns.forEach(function(b){
+    var el=document.createElement("button");
+    el.type="button";el.className="btn "+b.cls;el.textContent=b.label;
+    el.addEventListener("click",b.fn);
+    box.appendChild(el);
+  });
+  ov.hidden=false;
+  var f=box.querySelector("button");if(f)f.focus();
+}
+function hideOv(){ov.hidden=true;}
+
+function stuck(){
+  var b=[];
+  if(G.shuffles>0)b.push({label:"Mélanger les tuiles",cls:"pri",fn:doShuffle});
+  b.push({label:"Annuler le dernier coup",cls:"dark",fn:undo});
+  b.push({label:"Nouvelle partie",cls:"dark",fn:function(){newGame();}});
+  showOv("Yako !","Plus aucune paire libre. "+(G.shuffles>0?"Il te reste "+G.shuffles+" mélange"+(G.shuffles>1?"s":"")+".":"Tu n'as plus de mélange, mais tu peux revenir en arrière."),b);
+}
+
+function win(){
+  G.over=true;G.running=false;
+  var best=loadBest(),prev=best[G.key],rec=(prev==null||G.elapsed<prev);
+  if(rec){best[G.key]=G.elapsed;saveBest(best);}
+  refresh();
+  showOv("Bravo, champion !","Grille « "+LAYOUTS[G.key].name+" » vidée en "+fmt(G.elapsed)+(rec?". Nouveau record !":".")+" On est ensemble !",[
+    {label:"Rejouer",cls:"pri",fn:function(){newGame();}},
+    {label:"Changer de grille",cls:"dark",fn:function(){newGame(G.key==="basilique"?"pagne":"basilique");}}
+  ]);
+}
+
+function setSeg(key){
+  document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.k===key?"true":"false");});
+}
+
+function newGame(key){
+  key=key||(G&&G.key)||"basilique";
+  clearHint();hideOv();
+  var tiles=makeTiles(key);
+  var kinds=pairKinds(tiles.length/2,18);
+  var res=dealKinds(tiles,tiles.map(function(t){return t.i;}),kinds);
+  if(res){tiles.forEach(function(t){t.kind=res.get(t.i);});}
+  else{var flat=[];kinds.forEach(function(k){flat.push(k,k);});shuffle(flat);tiles.forEach(function(t,n){t.kind=flat[n];});}
+  G={key:key,tiles:tiles,sel:null,history:[],shuffles:3,running:false,t0:0,elapsed:0,over:false,pairs:[]};
+  setSeg(key);
+  build(true);
+  say("Associe deux tuiles identiques. Elles doivent être libres : rien dessus, un côté dégagé.");
+}
+
+function snap(){
+  if(!G)return {};
+  return {key:G.key,kinds:G.tiles.map(function(t){return t.kind;}),removed:G.tiles.map(function(t){return t.removed?1:0;}),history:G.history,shuffles:G.shuffles,elapsed:G.elapsed,running:G.running,over:G.over};
+}
+
+function restore(d){
+  var tiles=makeTiles(d.key);
+  tiles.forEach(function(t,n){t.kind=d.kinds[n];t.removed=!!d.removed[n];});
+  G={key:d.key,tiles:tiles,sel:null,history:d.history||[],shuffles:d.shuffles,running:false,t0:0,elapsed:d.elapsed||0,over:!!d.over,pairs:[]};
+  setSeg(d.key);
+  build(false);
+  if(d.running&&!G.over){G.running=true;G.t0=performance.now()-G.elapsed*1000;}
+}
+
+stage.addEventListener("click",function(e){
+  var b=e.target.closest(".tile");
+  if(b&&G)onTile(G.tiles[+b.dataset.i]);
+});
+$("undo").addEventListener("click",undo);
+$("hint").addEventListener("click",hint);
+$("shuffle").addEventListener("click",doShuffle);
+$("new").addEventListener("click",function(){newGame();});
+document.querySelectorAll(".seg button").forEach(function(b){b.addEventListener("click",function(){newGame(b.dataset.k);});});
+window.addEventListener("resize",function(){if(G)place();});
+
+$("legend").innerHTML=NAMES.map(function(n,k){
+  return '<li><span class="chip"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#s'+k+'" width="48" height="48"/></svg></span><span><b>'+n+'</b><small>'+CAPS[k]+'</small></span></li>';
+}).join("");
+
+function start(d){
+  d=d||{};
+  try{
+    if(d.key&&LAYOUTS[d.key]&&d.kinds&&d.kinds.length===LAYOUTS[d.key].tiles.length){restore(d);return;}
+  }catch(e){}
+  newGame("basilique");
+}
+var hot=window.claude&&window.claude.hot;
+try{if(hot&&hot.snapshot)hot.snapshot(snap);}catch(e){}
+if(hot&&hot.ready)hot.ready(start);else start(hot&&hot.data);
+})();
+</script>
+
+</body></html>
